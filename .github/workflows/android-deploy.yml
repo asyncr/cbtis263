@@ -1,0 +1,39 @@
+#Test pipeline
+
+name: Construir apk
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build:
+    name: Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    
+    - uses: actions/setup-java@v2
+      with: 
+        distribution: 'temurin'
+        java-version: '11'
+    
+    - uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
+
+    - run: flutter pub get
+      name: Obtener paquetes
+
+    - run: flutter build apk --split-per-abi
+      name: Construir apk
+
+    - name: Entregar apk a github
+      uses: ncipollo/release-action@v1
+      with:
+        artifact: "build/app/outputs/flutter-apk/*.apk"
+
+
+
